@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Dashboard</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+    <h1>Data Visualization Dashboard</h1>
+    
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="file">Upload CSV file:</label>
+        <input type="file" id="file" name="file" accept=".csv">
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+
+    <div id="charts"></div>
+
+    <script>
+        function uploadFile() {
+            var fileInput = document.getElementById('file');
+            var file = fileInput.files[0];
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderCharts(data.charts_data);
+                } else {
+                    alert('Error uploading file: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function renderCharts(chartsData) {
+            var chartsContainer = document.getElementById('charts');
+            chartsContainer.innerHTML = '';
+
+            for (var key in chartsData) {
+                var chartData = chartsData[key];
+                var chartDiv = document.createElement('div');
+                chartDiv.id = key + '-chart';
+                chartDiv.style.width = '50%';
+                chartDiv.style.margin = '20px auto';
+                chartsContainer.appendChild(chartDiv);
+
+                renderChart(key + '-chart', chartData);
+            }
+        }
+
+        function renderChart(chartId, chartData) {
+            var svg = d3.select('#' + chartId)
+                .append('svg')
+                .attr('width', '100%')
+                .attr('height', 400);
+
+            // Customize this section based on the chart type you want to create
+            if (chartData.type === 'bar') {
+                var xScale = d3.scaleBand()
+                    .domain(chartData.labels)
+                    .range([0, 1000])
+                    .padding(0.1);
+
+                var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(chartData.data)])
+                    .range([400, 0]);
+
+                svg.selectAll('rect')
+                    .data(chartData.data)
+                    .enter()
+                    .append('rect')
+                    .attr('x', (d, i) => xScale(chartData.labels[i]))
+                    .attr('y', d => yScale(d))
+                    .attr('width', xScale.bandwidth())
+                    .attr('height', d => 400 - yScale(d))
+                    .attr('fill', 'blue');
+            }
+        }
+    </script>
+</body>
+</html>
