@@ -35,17 +35,6 @@ This project is a simple web application built using Flask and D3.js to visualiz
 
 ## Project Structure
 
-data_visualization_dashboard/
-|-- static/
-|   |-- js/
-|       |-- d3.min.js
-|-- templates/
-|   |-- index.html
-|-- app.py
-|-- requirements.txt
-|-- README.md
-
-
 - **static/js/d3.min.js:** D3.js library for data visualization.
 - **templates/index.html:** HTML template for the web interface.
 - **app.py:** Python script for the Flask backend.
